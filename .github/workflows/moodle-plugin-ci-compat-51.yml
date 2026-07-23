@@ -1,0 +1,81 @@
+name: Moodle Plugin CI Compatibility 5.1
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 3
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - moodle-branch: MOODLE_501_STABLE
+            php: "8.2"
+            database: pgsql
+
+    steps:
+      - name: Checkout plugin
+        uses: actions/checkout@v4
+        with:
+          path: plugin
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: pgsql, zip, gd, intl, mbstring, xml, soap, curl
+          ini-values: max_input_vars=5000, memory_limit=512M
+          coverage: none
+
+      - name: Initialise moodle-plugin-ci
+        run: |
+          composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ^4
+          echo "$(pwd)/ci/bin" >> $GITHUB_PATH
+          echo "$(pwd)/ci/vendor/bin" >> $GITHUB_PATH
+          sudo locale-gen en_AU.UTF-8
+
+      - name: Install test environment
+        run: moodle-plugin-ci install --plugin ./plugin --db-host=127.0.0.1
+        env:
+          DB: ${{ matrix.database }}
+          MOODLE_BRANCH: ${{ matrix.moodle-branch }}
+
+      - name: Validate plugin
+        run: moodle-plugin-ci validate
+
+      - name: PHP lint
+        run: moodle-plugin-ci phplint
+
+      - name: Moodle Code Checker
+        run: moodle-plugin-ci phpcs --max-warnings 0
+
+      - name: PHP Mess Detector
+        continue-on-error: true
+        run: moodle-plugin-ci phpmd
+
+      - name: PHPDoc checker
+        continue-on-error: true
+        run: moodle-plugin-ci phpdoc
+
+      - name: Mustache lint
+        run: moodle-plugin-ci mustache
+
+      - name: PHPUnit
+        continue-on-error: true
+        run: moodle-plugin-ci phpunit

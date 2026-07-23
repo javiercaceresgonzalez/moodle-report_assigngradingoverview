@@ -1,0 +1,30 @@
+.report-assigngradingoverview-toolbar > #id_filtersheader {
+    margin-bottom: 0;
+    border-bottom: 0;
+}
+
+.report-assigngradingoverview-toolbar #id_filtersheader .ftoggler h3 {
+    font-size: 1.125rem;
+}
+
+.report-assigngradingoverview-toolbar #id_filtersheader .fheader {
+    width: 2rem;
+    height: 2rem;
+    min-width: 2rem;
+    margin-right: .5rem;
+}
+
+.report-assigngradingoverview-toolbar #id_filtersheader .fheader .icon {
+    width: .875rem;
+    height: .875rem;
+}
+
+.report-assigngradingoverview-toolbar #id_filtersheadercontainer {
+    max-width: 60rem;
+}
+
+#page-report-assigngradingoverview-index nav.pagination,
+#page-report-assigngradingoverview-course nav.pagination {
+    margin-block: 1rem;
+}
+
