@@ -27,6 +27,25 @@ The plugin is read-only. It links to Moodle's standard Assignment submission and
 - Optional primary-navigation entry for the global report.
 - English and Spanish language packs.
 
+
+## Screenshots
+
+**Global report**
+
+![Global report](docs/images/global-report.png)
+
+**Filters**
+
+![Global report filters](docs/images/global-report-filters.png)
+
+**Course report**
+
+![Course report](docs/images/course-report.png)
+
+**Plugin settings**
+
+![Plugin settings](docs/images/plugin-settings.png)
+
 ## Requirements
 
 - Moodle 4.5 or later.
