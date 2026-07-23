@@ -1,0 +1,33 @@
+# Operating system files.
+.DS_Store
+Thumbs.db
+
+# Editor and IDE files.
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Local environment files.
+.env
+.env.*
+.phpunit.result.cache
+
+# Dependency directories.
+/vendor/
+/node_modules/
+
+# Build and coverage output.
+/coverage/
+/build/
+/dist/
+
+# Logs and temporary files.
+*.log
+*.tmp
+*.bak
+
+# Moodle plugin CI local artifacts.
+/moodle-plugin-ci.phar
+/.moodle-plugin-ci/
