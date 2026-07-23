@@ -81,5 +81,4 @@ jobs:
         run: moodle-plugin-ci mustache
 
       - name: PHPUnit
-        continue-on-error: true
         run: moodle-plugin-ci phpunit
