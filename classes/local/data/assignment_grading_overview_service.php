@@ -84,7 +84,7 @@ final class assignment_grading_overview_service {
     /**
      * Sort summaries using a validated field and direction.
      *
-     * @param array<int, assignment_summary> $summaries Summaries to sort in place.
+     * @param assignment_summary[] $summaries Summaries to sort in place.
      * @param string $sort Sort field.
      * @param string $direction Sort direction.
      * @return void
