@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details for the Assignment grading overview report plugin.
+ * Cache definitions for report_assigngradingoverview.
  *
  * @package    report_assigngradingoverview
  * @copyright  2026 Javier Caceres Gonzalez <javiercaceresgonzalez@gmail.com>
@@ -24,9 +24,14 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'report_assigngradingoverview';
-$plugin->version = 2026072300;
-$plugin->requires = 2024100700; // Requires Moodle 4.5 or later.
-$plugin->maturity = MATURITY_STABLE;
-$plugin->release = '1.0.0';
-$plugin->dependencies = ['mod_assign' => ANY_VERSION];
+$definitions = [
+    // Whether the current user may access the global report at all. Checked on
+    // every page when the primary-navigation entry is enabled, so the result
+    // is kept per session for a few minutes.
+    'potentialaccess' => [
+        'mode' => \core_cache\store::MODE_SESSION,
+        'simplekeys' => true,
+        'simpledata' => true,
+        'ttl' => 600,
+    ],
+];

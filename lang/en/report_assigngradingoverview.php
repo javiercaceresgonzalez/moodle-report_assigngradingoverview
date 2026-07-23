@@ -29,6 +29,7 @@ $string['allgroups'] = 'All accessible groups';
 $string['applyfilters'] = 'Apply filters';
 $string['assigngradingoverview:view'] = 'View the assignment grading overview';
 $string['assignment'] = 'Assignment';
+$string['cachedef_potentialaccess'] = 'Whether the current user may access the global assignment grading overview';
 $string['course'] = 'Course';
 $string['course_help'] = 'Select the course whose assignments you want to review. In the global view, “All courses” includes courses in which you can grade.';
 $string['defaultpendingonly'] = 'Show pending assignments initially';

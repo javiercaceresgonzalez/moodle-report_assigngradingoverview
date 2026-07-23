@@ -51,4 +51,17 @@ final class assignment_summary {
         $this->pending = max(0, min($pending, $this->submitted));
         $this->graded = max(0, min($this->submitted, $this->submitted - $this->pending));
     }
+
+    /**
+     * Set the participant count once it is known.
+     *
+     * Participants are loaded separately because they are only needed for the
+     * rows that end up on the visible page.
+     *
+     * @param int $participants Number of participants.
+     * @return void
+     */
+    public function set_participants(int $participants): void {
+        $this->participants = max(0, $participants);
+    }
 }
