@@ -122,6 +122,7 @@ $summaries = $service->get_summaries($filter);
 $service->sort($summaries, $sort, $direction);
 $table->pagesize($filter->perpage, count($summaries));
 $pagesummaries = array_slice($summaries, $page * $filter->perpage, $filter->perpage);
+$service->load_participants($pagesummaries, $filter);
 
 echo $OUTPUT->header();
 $form->display();

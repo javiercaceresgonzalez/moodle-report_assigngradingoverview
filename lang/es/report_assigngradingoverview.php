@@ -29,6 +29,7 @@ $string['allgroups'] = 'Todos los grupos accesibles';
 $string['applyfilters'] = 'Aplicar filtros';
 $string['assigngradingoverview:view'] = 'Ver el resumen de calificación de tareas';
 $string['assignment'] = 'Tarea';
+$string['cachedef_potentialaccess'] = 'Si el usuario actual puede acceder al resumen global de calificación de tareas';
 $string['course'] = 'Curso';
 $string['course_help'] = 'Selecciona el curso cuyas tareas quieres consultar. En la vista global, «Todos los cursos» reúne los cursos en los que puedes calificar.';
 $string['defaultpendingonly'] = 'Mostrar inicialmente solo tareas pendientes';

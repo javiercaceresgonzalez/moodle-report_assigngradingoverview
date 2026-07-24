@@ -29,6 +29,8 @@ use report_assigngradingoverview\local\dto\filter;
 final class assignment_repository {
     /** @var access_manager Access checker. */
     private access_manager $access;
+    /** @var array<string, array<int, \stdClass>> Request-level candidate cache keyed by filter signature. */
+    private array $candidates = [];
 
     /**
      * Create an assignment repository.
@@ -50,6 +52,13 @@ final class assignment_repository {
      */
     public function get_candidates(filter $filter): array {
         global $DB;
+
+        // The same structural set is often needed more than once per request
+        // (course options, validation and summaries); cache it per filter shape.
+        $cachekey = $filter->courseid . '|' . $filter->search . '|' . $filter->visibility . '|' . $filter->duedatestatus;
+        if (isset($this->candidates[$cachekey])) {
+            return $this->candidates[$cachekey];
+        }
 
         $params = ['assignmodule' => 'assign'];
         $where = ['cm.deletioninprogress = 0'];
@@ -84,7 +93,7 @@ final class assignment_repository {
 
         $sql = "SELECT cm.id AS cmid, cm.course AS courseid,
                        c.fullname AS coursename,
-                       a.name AS assignmentname, a.duedate
+                       a.id AS instanceid, a.name AS assignmentname, a.duedate, a.teamsubmission
                   FROM {course_modules} cm
                   JOIN {modules} m ON m.id = cm.module AND m.name = :assignmodule
                   JOIN {assign} a ON a.id = cm.instance
@@ -107,7 +116,90 @@ final class assignment_repository {
                 debugging($exception->getMessage(), DEBUG_DEVELOPER);
             }
         }
-        return $result;
+        return $this->candidates[$cachekey] = $result;
+    }
+
+    /**
+     * Count submitted and pending submissions for every candidate with aggregate SQL.
+     *
+     * The queries mirror assign::count_submissions_with_status() and
+     * assign::count_submissions_need_grading() so the numbers match the ones
+     * mod_assign itself reports, at a handful of queries per course instead of
+     * several queries per assignment.
+     *
+     * @param \stdClass[] $candidates Candidate records keyed by course-module ID.
+     * @return array<int, \stdClass> Objects with submitted and pending counts keyed by course-module ID.
+     */
+    public function get_submission_counters(array $candidates): array {
+        global $CFG, $DB;
+        require_once($CFG->dirroot . '/mod/assign/locallib.php');
+
+        $counters = [];
+        $individual = [];
+        $team = [];
+        foreach ($candidates as $record) {
+            $counters[$record->cmid] = (object)['submitted' => 0, 'pending' => 0];
+            if ($record->teamsubmission) {
+                $team[$record->instanceid] = $record->cmid;
+            } else {
+                $individual[$record->courseid][$record->instanceid] = $record->cmid;
+            }
+        }
+
+        // Group submissions are stored against userid zero and are never counted
+        // as needing grading by core, so one site-wide query covers them all.
+        if ($team) {
+            [$insql, $params] = $DB->get_in_or_equal(array_keys($team), SQL_PARAMS_NAMED);
+            $params['substatus'] = ASSIGN_SUBMISSION_STATUS_SUBMITTED;
+            $teamsql = "SELECT s.assignment, COUNT(s.id)
+                          FROM {assign_submission} s
+                         WHERE s.assignment $insql AND s.userid = 0 AND s.latest = 1
+                               AND s.timemodified IS NOT NULL AND s.status = :substatus
+                      GROUP BY s.assignment";
+            foreach ($DB->get_records_sql_menu($teamsql, $params) as $instanceid => $count) {
+                $counters[$team[$instanceid]]->submitted = (int)$count;
+            }
+        }
+
+        // Since Moodle 5.1 core counts distinct submitters across all enrolments,
+        // including suspended ones; earlier branches count active enrolments only.
+        $modern = method_exists(\assign::class, 'count_submissions_with_status_and_groups');
+        foreach ($individual as $courseid => $instances) {
+            $context = \context_course::instance($courseid);
+            [$insql, $inparams] = $DB->get_in_or_equal(array_keys($instances), SQL_PARAMS_NAMED);
+
+            [$esql, $eparams] = get_enrolled_sql($context, '', 0, !$modern);
+            $countfield = $modern ? 'COUNT(DISTINCT s.userid)' : 'COUNT(s.userid)';
+            $submittedsql = "SELECT s.assignment, $countfield
+                               FROM {assign_submission} s
+                               JOIN ($esql) e ON e.id = s.userid
+                              WHERE s.assignment $insql AND s.latest = 1
+                                    AND s.timemodified IS NOT NULL AND s.status = :substatus
+                           GROUP BY s.assignment";
+            $submittedparams = $inparams + $eparams + ['substatus' => ASSIGN_SUBMISSION_STATUS_SUBMITTED];
+            foreach ($DB->get_records_sql_menu($submittedsql, $submittedparams) as $instanceid => $count) {
+                $counters[$instances[$instanceid]]->submitted = (int)$count;
+            }
+
+            [$esql, $eparams] = get_enrolled_sql($context, '', 0, true);
+            $pendingsql = "SELECT s.assignment, COUNT(s.userid)
+                             FROM {assign_submission} s
+                        LEFT JOIN {assign_grades} g ON g.assignment = s.assignment
+                                                   AND g.userid = s.userid
+                                                   AND g.attemptnumber = s.attemptnumber
+                             JOIN ($esql) e ON e.id = s.userid
+                             JOIN {assign} a ON a.id = s.assignment
+                            WHERE s.assignment $insql AND s.latest = 1
+                                  AND s.timemodified IS NOT NULL AND s.status = :substatus
+                                  AND (s.timemodified >= g.timemodified OR g.timemodified IS NULL
+                                       OR g.grade IS NULL OR (a.grade < 0 AND g.grade = -1))
+                         GROUP BY s.assignment";
+            $pendingparams = $inparams + $eparams + ['substatus' => ASSIGN_SUBMISSION_STATUS_SUBMITTED];
+            foreach ($DB->get_records_sql_menu($pendingsql, $pendingparams) as $instanceid => $count) {
+                $counters[$instances[$instanceid]]->pending = (int)$count;
+            }
+        }
+        return $counters;
     }
 
     /**

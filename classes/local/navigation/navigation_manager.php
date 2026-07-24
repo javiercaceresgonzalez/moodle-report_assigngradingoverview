@@ -49,9 +49,32 @@ final class navigation_manager {
     /**
      * Check whether the current user can grade an assignment in any course.
      *
+     * The result is kept in a session cache because this runs on every page
+     * when the primary-navigation entry is enabled, and the underlying check
+     * walks the user's courses.
+     *
      * @return bool Whether the global report should be available.
      */
     public function has_potential_access(): bool {
+        global $USER;
+
+        $cache = \core_cache\cache::make('report_assigngradingoverview', 'potentialaccess');
+        $key = 'user' . (int)$USER->id;
+        $cached = $cache->get($key);
+        if ($cached !== false) {
+            return (bool)$cached;
+        }
+        $result = $this->compute_potential_access();
+        $cache->set($key, (int)$result);
+        return $result;
+    }
+
+    /**
+     * Compute global report availability without caching.
+     *
+     * @return bool Whether the global report should be available.
+     */
+    private function compute_potential_access(): bool {
         if (is_siteadmin()) {
             return true;
         }
