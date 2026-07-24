@@ -28,7 +28,7 @@ global $CFG;
 require_once($CFG->dirroot . '/mod/assign/locallib.php');
 
 /**
- * Aggregated counters must match the official mod_assign counting API.
+ * Aggregated counters must match the mod_assign counting API.
  *
  * @package    report_assigngradingoverview
  * @copyright  2026 Javier Caceres Gonzalez <javiercaceresgonzalez@gmail.com>

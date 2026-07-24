@@ -116,7 +116,7 @@ $sortcolumns = $table->get_sort_columns();
 $sort = $sortcolumns ? array_key_first($sortcolumns) : 'default';
 $direction = $sortcolumns && reset($sortcolumns) === SORT_ASC ? 'asc' : 'desc';
 
-// Calculate and sort live counters before slicing the rows for the current page.
+// Calculate sortable counters, slice the current page, then load participant counts only for visible rows.
 $service = new assignment_grading_overview_service($repository, $access);
 $summaries = $service->get_summaries($filter);
 $service->sort($summaries, $sort, $direction);

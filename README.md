@@ -1,6 +1,6 @@
 # Assignment grading overview
 
-`report_assigngradingoverview` is a Moodle report plugin that gives teachers a clear overview of the grading status of Assignment activities (`mod_assign`). It helps graders quickly identify submitted work, pending grading and the assignments that need attention across one course or across all accessible courses.
+`report_assigngradingoverview` is a Moodle report plugin that gives teachers a clear overview of the grading status of Assignment activities (`mod_assign`). It helps graders quickly identify submitted work, pending grading and assignments that need attention across one course or across all accessible courses.
 
 The plugin is read-only. It links to Moodle's standard Assignment submission and grading pages, but it does not replace the grader, modify submissions or change grades.
 
@@ -20,13 +20,12 @@ The plugin is read-only. It links to Moodle's standard Assignment submission and
 
 - Site-wide overview of assignments the current user can grade.
 - Course report integrated into Moodle's standard **Reports** navigation and report selector.
-- Live counts for participants, submitted work, graded work and submissions awaiting grading.
+- Live grading status counts, with submitted and pending counters calculated efficiently through aggregate queries.
 - Filters for course, group, assignment name, due date status, visibility and pending work.
 - Sortable and paginated table based on Moodle's native table API.
 - Direct links to view submissions and open the Assignment grader.
 - Optional primary-navigation entry for the global report.
 - English and Spanish language packs.
-
 
 ## Screenshots
 
@@ -77,26 +76,30 @@ The course report is available from the course Reports area when the user has ac
 
 ## Settings
 
-Administrators can configure whether the global report appears in primary navigation, the default number of assignments per page, whether hidden activities can be included, whether the report initially shows only assignments with pending grading and whether hidden courses can be included when the user has access to them.
+Administrators can configure whether the global report appears in primary navigation, the default number of assignments per page, hidden activity visibility, the initial pending-only filter state and whether hidden courses can be included when the user has access to them.
 
 The primary-navigation entry and hidden-course inclusion are disabled by default.
 
 ## Data and Privacy
 
-The report reads information from Moodle when it is displayed. It stores no personal data, no report state and no user preferences. It does not list individual students or expose submission contents.
+The report reads information from Moodle when it is displayed. It stores no personal data, report filters or user preferences. A short-lived session cache may store whether the global navigation entry is available for the current user. The report does not list individual students or expose submission contents.
 
-Counts are calculated using Moodle's Assignment APIs so they follow the standard behaviour for enrolments, groups, submissions and grading state.
+Submitted and pending counters are calculated with aggregate queries that mirror Moodle Assignment behaviour. Participant counts continue to use the Assignment API for the visible rows, so enrolments, groups, availability and module rules remain consistent with Moodle.
 
 ## Performance
 
-Assignment metadata is filtered through Moodle's database API, while participant and submission counters are calculated live through `mod_assign`. This preserves Moodle's grading semantics. Sites with very large teaching portfolios should test the report with representative data before enabling broad access.
+Assignment metadata is filtered through Moodle database API. Submitted and pending counters are calculated with aggregate SQL, while participant counts are loaded through `mod_assign` only for the rows shown on the current page. This keeps the report responsive on sites with many gradable assignments while preserving Moodle grading semantics.
 
 ## Scope
 
-Version 1.0 focuses on Assignment activities only. It does not report on quizzes, forums, workshops, gradebook items or third-party activity modules.
+The plugin focuses on Assignment activities only. It does not report on quizzes, forums, workshops, gradebook items or third-party activity modules.
+
+## Credits
+
+Developed and maintained by Javier Caceres Gonzalez.
+
+Special thanks to [@SergioComeron](https://github.com/SergioComeron) for improving the performance of the aggregate counters.
 
 ## License
-
-Copyright 2026 Javier Caceres Gonzalez.
 
 This plugin is licensed under the GNU GPL v3 or later. See [LICENSE](LICENSE).

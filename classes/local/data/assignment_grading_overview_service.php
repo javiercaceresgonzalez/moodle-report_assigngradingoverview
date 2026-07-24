@@ -21,7 +21,7 @@ use report_assigngradingoverview\local\dto\assignment_summary;
 use report_assigngradingoverview\local\dto\filter;
 
 /**
- * Builds grading summaries from the official mod_assign API.
+ * Builds grading summaries using aggregate counters and the mod_assign API where required.
  *
  * @package    report_assigngradingoverview
  * @copyright  2026 Javier Caceres Gonzalez <javiercaceresgonzalez@gmail.com>
@@ -78,7 +78,7 @@ final class assignment_grading_overview_service {
      * Build summaries for a specific group through the mod_assign API.
      *
      * A group filter implies a single course, so the per-assignment cost of the
-     * official counting API stays acceptable and its group semantics are kept.
+     * mod_assign counting API stays acceptable and its group semantics are kept.
      *
      * @param \stdClass[] $candidates Candidate records keyed by course-module ID.
      * @param filter $filter Validated report filters with a group selected.
