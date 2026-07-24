@@ -103,7 +103,10 @@ if ($form->get_data()) {
 $PAGE->requires->js_call_amd('report_assigngradingoverview/filter_state', 'init');
 
 // Table setup resolves the requested or default sorting before the data service applies it.
-$table = new assignment_table('report-assigngradingoverview-course-' . $course->id, $baseurl, false);
+// The table URL omits the page number so sort links restart from the first page of the new order.
+$tableurl = new moodle_url($baseurl);
+$tableurl->remove_params('page');
+$table = new assignment_table('report-assigngradingoverview-course-' . $course->id, $tableurl, false);
 $table->pagesize($filter->perpage, 0);
 $table->setup();
 $sortcolumns = $table->get_sort_columns();
