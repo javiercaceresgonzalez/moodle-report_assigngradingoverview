@@ -154,21 +154,29 @@ final class assignment_grading_overview_service {
         $allowed = ['course', 'assignment', 'submitted', 'graded', 'pending', 'duedate'];
         $sort = in_array($sort, $allowed, true) ? $sort : 'default';
         $factor = $direction === 'asc' ? 1 : -1;
-        usort($summaries, static function (assignment_summary $left, assignment_summary $right) use ($sort, $factor): int {
+        $ranks = [
+            'assignment' => in_array($sort, ['default', 'course', 'assignment'], true)
+                ? $this->get_name_ranks($summaries, 'assignmentname') : [],
+            'course' => $sort === 'course' ? $this->get_name_ranks($summaries, 'coursename') : [],
+        ];
+        usort($summaries, static function (assignment_summary $left, assignment_summary $right) use ($sort, $factor, $ranks): int {
+            $leftid = spl_object_id($left);
+            $rightid = spl_object_id($right);
             if ($sort === 'default') {
-                return [$left->record->courseid, -$left->pending, $left->record->assignmentname]
-                    <=> [$right->record->courseid, -$right->pending, $right->record->assignmentname];
+                return [$left->record->courseid, -$left->pending, $ranks['assignment'][$leftid]]
+                    <=> [$right->record->courseid, -$right->pending, $ranks['assignment'][$rightid]];
             }
             if ($sort === 'course') {
-                $coursecomparison = $factor * ($left->record->courseid <=> $right->record->courseid);
+                $coursecomparison = $factor * ([$ranks['course'][$leftid], $left->record->courseid]
+                    <=> [$ranks['course'][$rightid], $right->record->courseid]);
                 if ($coursecomparison !== 0) {
                     return $coursecomparison;
                 }
-                return [-$left->pending, $left->record->assignmentname]
-                    <=> [-$right->pending, $right->record->assignmentname];
+                return [-$left->pending, $ranks['assignment'][$leftid]]
+                    <=> [-$right->pending, $ranks['assignment'][$rightid]];
             }
             $values = [
-                'assignment' => [$left->record->assignmentname, $right->record->assignmentname],
+                'assignment' => [$ranks['assignment'][$leftid], $ranks['assignment'][$rightid]],
                 'submitted' => [$left->submitted, $right->submitted],
                 'graded' => [$left->graded, $right->graded],
                 'pending' => [$left->pending, $right->pending],
@@ -176,5 +184,28 @@ final class assignment_grading_overview_service {
             ];
             return $factor * ($values[$sort][0] <=> $values[$sort][1]);
         });
+    }
+
+    /**
+     * Rank summaries by a localised name using natural locale-aware collation.
+     *
+     * usort() needs pairwise comparisons but core_collator only sorts whole
+     * arrays, so every formatted name is ranked once up front and rows compare
+     * ranks instead; equal names share a rank so tie-breakers still apply.
+     *
+     * @param assignment_summary[] $summaries Summaries to rank.
+     * @param string $field Record field holding the raw name.
+     * @return int[] Collation ranks keyed by summary object ID.
+     */
+    private function get_name_ranks(array $summaries, string $field): array {
+        $context = \context_system::instance();
+        $names = [];
+        foreach ($summaries as $summary) {
+            $names[spl_object_id($summary)] = format_string($summary->record->{$field}, true, ['context' => $context]);
+        }
+        $sorted = array_unique($names);
+        \core_collator::asort($sorted, \core_collator::SORT_NATURAL);
+        $ranks = array_flip(array_values($sorted));
+        return array_map(static fn(string $name): int => $ranks[$name], $names);
     }
 }
