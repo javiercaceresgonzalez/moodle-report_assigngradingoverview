@@ -70,7 +70,6 @@ jobs:
         run: moodle-plugin-ci phpmd
 
       - name: PHPDoc checker
-        continue-on-error: true
         run: moodle-plugin-ci phpdoc
 
       - name: Mustache lint
