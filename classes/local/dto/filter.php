@@ -75,7 +75,7 @@ final class filter {
      *
      * @param bool $defaultpendingonly Default pending-only state.
      * @param int $defaultperpage Default rows per page.
-     * @return array<string, int|string> Canonical URL parameters.
+     * @return array Canonical URL parameters.
      */
     public function get_url_params(bool $defaultpendingonly, int $defaultperpage): array {
         $params = [];

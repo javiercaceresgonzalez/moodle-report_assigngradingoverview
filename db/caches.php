@@ -19,6 +19,7 @@
  *
  * @package    report_assigngradingoverview
  * @copyright  2026 Javier Caceres Gonzalez <javiercaceresgonzalez@gmail.com>
+ * @copyright  2026 Sergio Comerón <sergiocomeron@icloud.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

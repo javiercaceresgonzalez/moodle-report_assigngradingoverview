@@ -32,6 +32,7 @@ require_once($CFG->dirroot . '/mod/assign/locallib.php');
  *
  * @package    report_assigngradingoverview
  * @copyright  2026 Javier Caceres Gonzalez <javiercaceresgonzalez@gmail.com>
+ * @copyright  2026 Sergio Comerón <sergiocomeron@icloud.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class assignment_counters_test extends \advanced_testcase {
@@ -121,7 +122,7 @@ final class assignment_counters_test extends \advanced_testcase {
      * Run the service as the teacher and return summaries keyed by cmid.
      *
      * @param filter|null $filter Report filter, or null for no filters.
-     * @return array<int, assignment_summary> Summaries keyed by course-module ID.
+     * @return assignment_summary[] Summaries keyed by course-module ID.
      */
     private function get_summaries(?filter $filter = null): array {
         $filter = $filter ?? new filter();

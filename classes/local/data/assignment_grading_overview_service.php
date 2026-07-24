@@ -25,6 +25,7 @@ use report_assigngradingoverview\local\dto\filter;
  *
  * @package    report_assigngradingoverview
  * @copyright  2026 Javier Caceres Gonzalez <javiercaceresgonzalez@gmail.com>
+ * @copyright  2026 Sergio Comerón <sergiocomeron@icloud.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class assignment_grading_overview_service {
@@ -49,7 +50,7 @@ final class assignment_grading_overview_service {
      * Build all summaries matching the filter.
      *
      * @param filter $filter Validated report filters.
-     * @return array<int, assignment_summary> Matching assignment summaries.
+     * @return assignment_summary[] Matching assignment summaries.
      */
     public function get_summaries(filter $filter): array {
         global $CFG;
@@ -82,7 +83,7 @@ final class assignment_grading_overview_service {
      *
      * @param \stdClass[] $candidates Candidate records keyed by course-module ID.
      * @param filter $filter Validated report filters with a group selected.
-     * @return array<int, assignment_summary> Matching assignment summaries.
+     * @return assignment_summary[] Matching assignment summaries.
      */
     private function get_group_summaries(array $candidates, filter $filter): array {
         $summaries = [];

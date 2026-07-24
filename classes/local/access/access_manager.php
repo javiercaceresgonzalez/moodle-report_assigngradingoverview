@@ -51,7 +51,7 @@ final class access_manager {
      * Return groups the current user may use in course assignments.
      *
      * @param int $courseid Course ID.
-     * @return array<int, \stdClass> Groups keyed by group ID.
+     * @return \stdClass[] Groups keyed by group ID.
      */
     public function get_course_groups(int $courseid): array {
         $groups = [];

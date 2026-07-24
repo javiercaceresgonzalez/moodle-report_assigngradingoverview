@@ -24,12 +24,13 @@ use report_assigngradingoverview\local\dto\filter;
  *
  * @package    report_assigngradingoverview
  * @copyright  2026 Javier Caceres Gonzalez <javiercaceresgonzalez@gmail.com>
+ * @copyright  2026 Sergio Comerón <sergiocomeron@icloud.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class assignment_repository {
     /** @var access_manager Access checker. */
     private access_manager $access;
-    /** @var array<string, array<int, \stdClass>> Request-level candidate cache keyed by filter signature. */
+    /** @var \stdClass[][] Request-level candidate cache keyed by filter signature. */
     private array $candidates = [];
 
     /**
@@ -48,7 +49,7 @@ final class assignment_repository {
      * Counter-based filtering and sorting are deliberately handled by the service.
      *
      * @param filter $filter Validated filters.
-     * @return array<int, \stdClass> Records keyed by course-module ID.
+     * @return \stdClass[] Records keyed by course-module ID.
      */
     public function get_candidates(filter $filter): array {
         global $DB;
@@ -128,7 +129,7 @@ final class assignment_repository {
      * several queries per assignment.
      *
      * @param \stdClass[] $candidates Candidate records keyed by course-module ID.
-     * @return array<int, \stdClass> Objects with submitted and pending counts keyed by course-module ID.
+     * @return \stdClass[] Objects with submitted and pending counts keyed by course-module ID.
      */
     public function get_submission_counters(array $candidates): array {
         global $CFG, $DB;
@@ -205,7 +206,7 @@ final class assignment_repository {
     /**
      * Return courses represented by accessible candidates.
      *
-     * @return array<int, string> Course names keyed by course ID.
+     * @return string[] Course names keyed by course ID.
      */
     public function get_course_options(): array {
         $filter = new filter(0, 0, '', false);
