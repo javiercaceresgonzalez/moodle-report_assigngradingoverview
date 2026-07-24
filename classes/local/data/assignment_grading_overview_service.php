@@ -80,7 +80,7 @@ final class assignment_grading_overview_service {
      * A group filter implies a single course, so the per-assignment cost of the
      * official counting API stays acceptable and its group semantics are kept.
      *
-     * @param array<int, \stdClass> $candidates Candidate records keyed by course-module ID.
+     * @param \stdClass[] $candidates Candidate records keyed by course-module ID.
      * @param filter $filter Validated report filters with a group selected.
      * @return array<int, assignment_summary> Matching assignment summaries.
      */

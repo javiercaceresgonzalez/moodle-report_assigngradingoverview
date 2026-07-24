@@ -127,7 +127,7 @@ final class assignment_repository {
      * mod_assign itself reports, at a handful of queries per course instead of
      * several queries per assignment.
      *
-     * @param array<int, \stdClass> $candidates Candidate records keyed by course-module ID.
+     * @param \stdClass[] $candidates Candidate records keyed by course-module ID.
      * @return array<int, \stdClass> Objects with submitted and pending counts keyed by course-module ID.
      */
     public function get_submission_counters(array $candidates): array {
