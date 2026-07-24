@@ -109,9 +109,9 @@ final class assignment_table extends \core_table\flexible_table {
         } else {
             $row[] = get_string('never', 'report_assigngradingoverview');
         }
-        $submissionslabel = $OUTPUT->pix_icon('t/viewdetails', '', 'moodle', ['class' => 'mr-1'])
+        $submissionslabel = $OUTPUT->pix_icon('t/viewdetails', '', 'moodle', ['class' => 'mr-1 me-1'])
             . get_string('viewsubmissions', 'report_assigngradingoverview');
-        $graderlabel = $OUTPUT->pix_icon('i/grades', '', 'moodle', ['class' => 'mr-1'])
+        $graderlabel = $OUTPUT->pix_icon('i/grades', '', 'moodle', ['class' => 'mr-1 me-1'])
             . get_string('grade', 'report_assigngradingoverview');
         $actions = [
             \html_writer::link($submissionsurl, $submissionslabel),
